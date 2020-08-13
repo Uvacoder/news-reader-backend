@@ -1,0 +1,22 @@
+{
+  "name": "news-api",
+  "version": "1.0.0",
+  "description": "Backend for news reader demo",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SimonFolkerts/news-reader-api-demo.git"
+  },
+  "author": "Simon Folkerts",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SimonFolkerts/news-reader-api-demo/issues"
+  },
+  "homepage": "https://github.com/SimonFolkerts/news-reader-api-demo#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
