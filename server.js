@@ -1,9 +1,19 @@
+// add the express code to the scope and store it's export in a variable
 const express = require("express");
-const app = express();
-const cors = require("cors");
 
+// create a new instance of the express object and store it
+const app = express();
+
+// this middleware is used to handle CORS permissions. It allows the client and the api to avoid CORS issues
+// first it is made available to the scope and stored in a variable
+const cors = require("cors");
+// then the express instance stored in the app variable is instructe to incorporate cors
 app.use(cors());
 
+// this middleware is used to decode the body of put and post etc requests for us so we can see their contents in js
+app.use(express.json());
+
+// this is dummy data
 const data = [
   {
     id: "5f35ba7e1d510f4bad03e9fd",
@@ -121,21 +131,72 @@ const data = [
   },
 ];
 
+// this endpoint is if someone visits the root address (http://localhost:3000)
 app.get("/", (req, res) => {
   console.log(req.method);
   res.send("Done");
 });
 
+// when a get request is sent to the articles endpoint, the list of articles is sent back in an object
+// the client expects an object containing a property called articles, it has to match here or it won't work, simply sending the article object directly would result in the client throwing an error
 app.get("/articles", (req, res) => {
   console.log("articles requested");
   res.send({ articles: data });
 });
 
-app.get("/articles/:id", (req, res) => {
-  console.log(req.params.id);
-  res.send("specific article");
+// when a post request is sent to the articles endpoint, the request is simply returned to the server.
+// this achieves nothing but demonstrates that the endpoint is working
+app.post("/articles", (req, res) => {
+  console.log(req.body);
+  res.send(req.body);
 });
 
+// when a get request is sent to the articles endpoint and also includes an extra segment,
+// that segment is treated as a param called id.
+// this param is used to find the article in the array, which is sent back in an ojbect
+app.get("/articles/:id", (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  // loop through the array of articles called data
+  for (const article of data) {
+    // when the matching article is found via it's id,
+    if (article.id === id) {
+      // wrap it n an object and send it to the client
+      // the client expects an object containing a property called articles, it has to match here or it won't work, simply sending the article object directly would result in the client throwing an error
+      res.send({ article: article });
+    }
+  }
+});
+
+// when a put request is sent to the articles endpoint and also includes an extra segment, the
+// that segment is treated as a param called id.
+// this param is used to find the article in the array, which is then overwritten using the data sent in the put request
+app.put("/articles/:id", (req, res) => {
+  console.log(req.body);
+  const id = req.params.id;
+  console.log(id);
+  // loop through the array of articles called data
+  for (const article of data) {
+    // when the matching article is found via it's id,
+    if (article.id === id) {
+      // check if the title in the request has a value
+      if (req.body.title) {
+        // and if so, overwrite the title of the article fom the array with the title of the article sent from the browser.
+        article.title = req.body.title;
+      }
+      // etc
+      if (req.body.description) {
+        article.description = req.body.description;
+      }
+      if (req.body.body) {
+        article.body = req.body.body;
+      }
+    }
+  }
+  res.end();
+});
+
+// instruct the server to open port 3000 and react to any request that arrive there
 app.listen(3000, () => {
   console.log("Listening on port 3000...");
 });
