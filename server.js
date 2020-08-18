@@ -133,21 +133,21 @@ const data = [
 
 // this endpoint is if someone visits the root address (http://localhost:3000)
 app.get("/", (req, res) => {
-  console.log(req.method);
+  console.log(`${req.method} request received...`);
   res.send("Done");
 });
 
 // when a get request is sent to the articles endpoint, the list of articles is sent back in an object
 // the client expects an object containing a property called articles, it has to match here or it won't work, simply sending the article object directly would result in the client throwing an error
 app.get("/articles", (req, res) => {
-  console.log("articles requested");
+  console.log("get request for all articles received...");
   res.send({ articles: data });
 });
 
 // when a post request is sent to the articles endpoint, the request is simply returned to the server.
 // this achieves nothing but demonstrates that the endpoint is working
 app.post("/articles", (req, res) => {
-  console.log(req.body);
+  console.log(`post request for article ${id} received...`);
   res.send(req.body);
 });
 
@@ -156,7 +156,7 @@ app.post("/articles", (req, res) => {
 // this param is used to find the article in the array, which is sent back in an ojbect
 app.get("/articles/:id", (req, res) => {
   const id = req.params.id;
-  console.log(id);
+  console.log(`get request for article ${id} received...`);
   // loop through the array of articles called data
   for (const article of data) {
     // when the matching article is found via it's id,
@@ -168,13 +168,12 @@ app.get("/articles/:id", (req, res) => {
   }
 });
 
-// when a put request is sent to the articles endpoint and also includes an extra segment, the
+// when a put request is sent to the articles endpoint and also includes an extra segment
 // that segment is treated as a param called id.
 // this param is used to find the article in the array, which is then overwritten using the data sent in the put request
 app.put("/articles/:id", (req, res) => {
-  console.log(req.body);
   const id = req.params.id;
-  console.log(id);
+  console.log(`update request for article ${id} received...`);
   // loop through the array of articles called data
   for (const article of data) {
     // when the matching article is found via it's id,
@@ -194,6 +193,21 @@ app.put("/articles/:id", (req, res) => {
     }
   }
   res.end();
+});
+
+// when a delete request is sent to the articles endpoint and also includes an extra segment
+// that segment is treated as a param called id.
+// this param is used to find the article in the array, which is then deleted using the splice method
+app.delete("/articles/:id", (req, res) => {
+  const id = req.params.id;
+  console.log(`delete request for article ${id} received...`);
+  for (let i = 0; i < data.length; i++) {
+    const article = data[i];
+    if (article.id === id) {
+      data.splice(i, 1);
+      res.sendStatus(204);
+    }
+  }
 });
 
 // instruct the server to open port 3000 and react to any request that arrive there
