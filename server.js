@@ -1,6 +1,12 @@
 // add the express code to the scope and store it's export in a variable
 const express = require("express");
 
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+dotenv.config();
+
+const isProduction = process.env.MODE_ENV === "production";
+
 // create a new instance of the express object and store it
 const app = express();
 
@@ -13,6 +19,16 @@ app.use(cors());
 // this middleware is used to decode the body of put and post etc requests for us so we can see their contents in js
 app.use(express.json());
 
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+mongoose.connection.on("open", function (ref) {
+  console.log("MongoDB connected");
+});
+
+// ROUTING ----------------------------------------------------------------
+
 // this endpoint is if someone visits the root address (http://localhost:3000)
 app.get("/", (req, res) => {
   console.log(`${req.method} request received...`);
@@ -24,6 +40,7 @@ app.get("/", (req, res) => {
 const articles = require("./routes/articles.js");
 app.use("/articles", articles);
 
+// LISTEN ----------------------------------------------------------------
 
 // instruct the server to open port 3000 and react to any request that arrive there
 app.listen(3000, () => {
