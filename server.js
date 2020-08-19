@@ -25,6 +25,10 @@ mongoose.connect(process.env.MONGODB_URI, {
 });
 mongoose.connection.on("open", function (ref) {
   console.log("MongoDB connected");
+  // instruct the server to open port 3000 and react to any request that arrive there
+  app.listen(3000, () => {
+    console.log("Listening on port 3000...");
+  });
 });
 
 // ROUTING ----------------------------------------------------------------
@@ -39,10 +43,3 @@ app.get("/", (req, res) => {
 // the router is required into the scope and added to the middleware as the callback for that route, and all the endpoints in that particular router will handle any further url segments such as id etc
 const articles = require("./routes/articles.js");
 app.use("/articles", articles);
-
-// LISTEN ----------------------------------------------------------------
-
-// instruct the server to open port 3000 and react to any request that arrive there
-app.listen(3000, () => {
-  console.log("Listening on port 3000...");
-});
