@@ -25,6 +25,10 @@ mongoose.connect(process.env.MONGODB_URI, {
 });
 mongoose.connection.on("open", function (ref) {
   console.log("MongoDB connected");
+  // instruct the server to open port 3000 and react to any request that arrive there
+  app.listen(3000, () => {
+    console.log("Listening on port 3000...");
+  });
 });
 
 // ROUTING ----------------------------------------------------------------
@@ -66,12 +70,4 @@ app.use(function(err, req, res, next) {
     message: err.message,
     error: {}
   }});
-});
-
-
-// LISTEN ----------------------------------------------------------------
-
-// instruct the server to open port 3000 and react to any request that arrive there
-app.listen(3000, () => {
-  console.log("Listening on port 3000...");
 });

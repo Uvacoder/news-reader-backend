@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const crypto = require("crypto");
+const Article = require("../models/Article");
 
 // this is dummy data
 const data = [
@@ -119,80 +119,45 @@ const data = [
   },
 ];
 
-// when a get request is sent to the articles endpoint, the list of articles is sent back in an object
-// the client expects an object containing a property called articles, it has to match here or it won't work, simply sending the article object directly would result in the client throwing an error
 router.get("", (req, res) => {
-  console.log("get request for all articles received...");
-  res.send({ articles: data });
+  console.log("Get request for all articles received...");
+  Article.find({})
+    .sort({ createdAt: "desc" })
+    .then(function (results) {
+      return res.send(results);
+    });
 });
 
-// when a post request is sent to the articles endpoint, in id for that article is generated using the crypto module and is added to the article, the article is then pushed to the data array
 router.post("", (req, res) => {
-  console.log(`post request received...`);
-  const id = crypto.randomBytes(12).toString("hex");
-  let article = req.body;
-  article.id = id;
-  data.push(article);
-  res.sendStatus(200);
+  console.log(`Post request received...`);
+  console.log(req.body);
+  const article = new Article(req.body);
+  article.save().then((article) => {
+    res.send(article);
+  });
 });
 
-// when a get request is sent to the articles endpoint and also includes an extra segment,
-// that segment is treated as a param called id.
-// this param is used to find the article in the array, which is sent back in an ojbect
 router.get("/:id", (req, res) => {
   const id = req.params.id;
   console.log(`get request for article ${id} received...`);
-  // loop through the array of articles called data
-  for (const article of data) {
-    // when the matching article is found via it's id,
-    if (article.id === id) {
-      // wrap it n an object and send it to the client
-      // the client expects an object containing a property called articles, it has to match here or it won't work, simply sending the article object directly would result in the client throwing an error
-      res.send({ article: article });
+
+  Article.findById(id).then(function (article) {
+    if (!article) {
+      res.sendStatus(404);
+    } else {
+      res.send(article);
     }
-  }
+  });
 });
 
-// when a put request is sent to the articles endpoint and also includes an extra segment
-// that segment is treated as a param called id.
-// this param is used to find the article in the array, which is then overwritten using the data sent in the put request
-router.put("/:id", (req, res) => {
-  const id = req.params.id;
-  console.log(`update request for article ${id} received...`);
-  // loop through the array of articles called data
-  for (const article of data) {
-    // when the matching article is found via it's id,
-    if (article.id === id) {
-      // check if the title in the request has a value
-      if (req.body.title) {
-        // and if so, overwrite the title of the article fom the array with the title of the article sent from the browser.
-        article.title = req.body.title;
-      }
-      // etc
-      if (req.body.description) {
-        article.description = req.body.description;
-      }
-      if (req.body.body) {
-        article.body = req.body.body;
-      }
-    }
-  }
-  res.end();
-});
+// router.put("/:id", (req, res) => {
+//   const id = req.params.id;
+//   console.log(`Update request for article ${id} received...`);
+// });
 
-// when a delete request is sent to the articles endpoint and also includes an extra segment
-// that segment is treated as a param called id.
-// this param is used to find the article in the array, which is then deleted using the splice method
-router.delete("/:id", (req, res) => {
-  const id = req.params.id;
-  console.log(`delete request for article ${id} received...`);
-  for (let i = 0; i < data.length; i++) {
-    const article = data[i];
-    if (article.id === id) {
-      data.splice(i, 1);
-      res.sendStatus(204);
-    }
-  }
-});
+// router.delete("/:id", (req, res) => {
+//   const id = req.params.id;
+//   console.log(`Delete request for article ${id} received...`);
+// });
 
 module.exports = router;
