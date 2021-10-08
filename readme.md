@@ -1,4 +1,8 @@
 ### Using the API
+
+## news-reeder frontend
+[news-reeder frontend](https://github.com/Uvacoder/news-reeder/blob/master/README.md)
+
 #### Simple first test
 After running the server, for a quick test in the browser you can go to the following endpoints:
 
